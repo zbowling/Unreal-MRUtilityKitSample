@@ -9,18 +9,20 @@ LICENSE file in the root directory of this source tree.
 #include "DemoGameState.h"
 #include "Kismet/KismetMathLibrary.h"
 
+static const FVector DefaultActorScale(0.1f);
+
 void ADemoVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (!Cube && IsValid(CubeActor))
 	{
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		ActorSpawnParams.Owner = this;
-		Cube = GetWorld()->SpawnActor<AActor>(CubeActor, ActorSpawnParams);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Owner = this;
+		Cube = GetWorld()->SpawnActor<AActor>(CubeActor, SpawnParams);
 
-		Cube->SetActorScale3D(FVector(0.1));
+		Cube->SetActorScale3D(DefaultActorScale);
 		Cube->SetActorHiddenInGame(true);
 
 		UStaticMeshComponent* StaticMesh = Cube->GetComponentByClass<UStaticMeshComponent>();
@@ -39,7 +41,7 @@ void ADemoVRPawn::HideShapes()
 		Cube->SetActorHiddenInGame(true);
 	}
 
-	for (const auto Arrow : Arrows)
+	for (const auto& Arrow : Arrows)
 	{
 		Arrow->SetActorHiddenInGame(true);
 	}
@@ -75,17 +77,17 @@ AActor* ADemoVRPawn::GetArrowSafe(int32 Index)
 		return Arrows[Index];
 	}
 
-	const int32 OldArrowsNum = Arrows.Num();
+	const int32 OldArrowsCount = Arrows.Num();
 	Arrows.SetNum(Index + 1);
 
-	for (int32 I = OldArrowsNum; I < Arrows.Num(); ++I)
+	for (int32 I = OldArrowsCount; I < Arrows.Num(); ++I)
 	{
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		ActorSpawnParams.Owner = this;
-		const auto Arrow = GetWorld()->SpawnActor<AActor>(ArrowActor, ActorSpawnParams);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Owner = this;
+		AActor* const Arrow = GetWorld()->SpawnActor<AActor>(ArrowActor, SpawnParams);
 
-		Arrow->SetActorScale3D(FVector(0.1));
+		Arrow->SetActorScale3D(DefaultActorScale);
 		Arrow->SetActorHiddenInGame(true);
 
 		Arrows[I] = Arrow;
